@@ -20,7 +20,7 @@ button.add_button(parameter)
 
 change a button's parameters if they are different from the new one
 ```lua
-button.change_button(parameter)
+button.change_button(id, parameter)
 ```
 <hr>
 
@@ -53,7 +53,7 @@ button.remove_all_buttons()
 
 adds some settings
 ```lua
-button.settings
+button.settings(settings)
 ```
 <hr>
 
