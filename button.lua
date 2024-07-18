@@ -3,6 +3,7 @@ local mouse = {x=0, y=0}
 button = {}
 
 local reservedID = {0}
+local unpack = table.unpack or unpack
 local function distanceBetween(x1, x2, y1, y2)
     return math.sqrt( (x2 - x1)^2 + (y2 - y1)^2 )
 end
@@ -20,7 +21,6 @@ function button.update(mouseX, mouseY)
     mouse.x = mouseX
     mouse.y = mouseY
     for i, obj in ipairs(buttonMap) do
-        if love.mouse.isDown(obj.mouseTrigger) then
 
         local trigger = obj.trigger
         local assignedTrigger = assignTrigger(trigger, obj.falser)
@@ -44,8 +44,14 @@ function button.update(mouseX, mouseY)
                 end
             end
         end
+        if love.mouse.isDown(obj.mouseTrigger) then
         if activated == true then
-            obj.effect()
+            if obj.effect.args ~= nil then
+                obj.effect.func(unpack(obj.effect.args))
+            elseif obj.effect.func ~= nil then
+                obj.effect.func()
+            end
+
             if assignedTrigger == "falserActivate" then
                 obj.falser = true
             end
@@ -81,13 +87,35 @@ function button.change_button(id, parameter)
         if obj.id == id then
             -- changes values of obj to parameter
             for key, value in pairs(parameter) do
-                obj[key] = value
+                -- Check if the value is a table (I DON'T ABOUT THIS PART NESTED TABLE PART)
+                if type(value) == "table" and type(obj[key]) == "table" then
+                    -- Merge nested tables
+                    for nested_key, nested_value in pairs(value) do
+                        obj[key][nested_key] = nested_value
+                    end
+                else
+                    -- Directly assign non-table values
+                    obj[key] = value
+                end
             end
         end
     end
 end
 
+function button.remove_button(id)
+    for i, obj in ipairs(buttonMap) do
+        if obj.id == id then
+            table.remove(buttonMap, i)
+        end
+    end
+end
 
 function button.remove_all_buttons()
     buttonMap = {}
+end
+
+function button.settings(settings)
+    if settings.globalButtonMap == true then
+        _G.buttonMap = buttonMap
+    end
 end
