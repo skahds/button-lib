@@ -33,10 +33,11 @@ button.change_button(parameter)
 - effect : this needs to be made as a table
 - effect.func : this will be called once the trigger is activated (effect.func())
 - effect.args : this needs to be made as a table, leave nil if the effect.func does not need any argument
-- effect.args[1], effect.args[2]... : this will be given to effect.func(effect.args[1], ...)  
+- effect.args[1], effect.args[2]... : this will be given if exist to effect.func(effect.args[1], ...)  
 - mosueTrigger : same parameters as love.mouse.isDown(), defaults to 1
 - w : width (specific for rectangles)
 - h : height (specific for rectangles)
+- r : radius (specific for circles)
 
 removes a button with specific id
 ```lua
