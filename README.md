@@ -1,11 +1,12 @@
 # button-lib
 just a test for buttons in love2D
+only for collision, does not have gui
 
 add your path to the file
 ```lua
 require(".../button")
 ```
-put this in your love.update() and insert in your mouse position
+put this inside your love.update() and insert in your mouse position
 ```lua
 button.update(mouseX, mouseY)
 ```
@@ -29,15 +30,19 @@ button.change_button(id, parameter)
 - shape : "rec" (rectangle) or "circ" (circle)
 - x : int
 - y : int
-- triggerType : leave this out for now
-- effect : this needs to be made as a table
+- effect : this needs to be made as a table and inside will have tables of the effects, not of the effect parameters (see example bellow)
+- w : width (specific for rectangles)
+- h : height (specific for rectangles)
+- r : radius (specific for circles)
+
+## effect parameters
+these will be inside the effect
 - effect.func : this will be called once the trigger is activated (effect.func())
 - effect.args : this needs to be made as a table, leave nil if the effect.func does not need any argument
 - effect.args[1], effect.args[2]... : this will be given if exist to effect.func(effect.args[1], ...)  
 - mosueTrigger : same parameters as love.mouse.isDown(), defaults to 1
-- w : width (specific for rectangles)
-- h : height (specific for rectangles)
-- r : radius (specific for circles)
+- type : currently has 3 options, "onClick" for when the mouse clicks it, "onHover" for when the mouse is on top of the button, and "onMouseLeave" for when the mouse is not on top of the button
+- falser : this does not matter for "onClick" as it will be defaulted, only for "onMouseLeave" (or "onHover" if the mouse loads on top of it), having this as true means that it will not trigger the effect once loaded, already defaults to false
 
 removes a button with specific id
 ```lua
@@ -60,3 +65,17 @@ button.settings(settings)
 ## settings
 
 - globalButtonMap : true (already defaults to false), sets the buttonMap table to be global
+
+## Example uses for button creation
+this will add the button lib, make a rectangle shaped button in x position 50, y 50, have a widht of 100 and height of 100 and once clicked will do Add_num(10, 5)
+```lua
+    function love.load()
+        require("button")
+
+        button.add_button({id=1, shape="rec", x=50, y=50, w=100, h=100, effect={{
+            type="onClick",
+            func=Add_num,
+            args={10, 5}}}
+            })
+    end
+```

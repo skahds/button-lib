@@ -8,12 +8,11 @@ local function distanceBetween(x1, x2, y1, y2)
     return math.sqrt( (x2 - x1)^2 + (y2 - y1)^2 )
 end
 
-local function assignTrigger(trigger, falser)
-    if trigger == "press1" then
-        if falser == false then
-            return "falserActivate"
-        end
-        -- return true
+local function triggerEffect(effect)
+    if effect.args ~= nil then
+        effect.func(unpack(effect.args))
+    elseif effect.func ~= nil then
+        effect.func()
     end
 end
 
@@ -21,44 +20,54 @@ function button.update(mouseX, mouseY)
     mouse.x = mouseX
     mouse.y = mouseY
     for i, obj in ipairs(buttonMap) do
-
-        local trigger = obj.trigger
-        local assignedTrigger = assignTrigger(trigger, obj.falser)
         local activated = false
-        if assignedTrigger ~= false and obj.falser == false then
-            if obj.shape == "rec" then
-                if mouse.x >= obj.x and
-                mouse.x <= obj.x+obj.w and
-                mouse.y >= obj.y and
-                mouse.y <= obj.y+obj.h then
-                    if obj.effect ~= nil then
-                        activated = true
-                    end
-                end
-            end
-            if obj.shape == "circ" then
-                if distanceBetween(obj.x, mouse.x, obj.y, mouse.y) < obj.r then
-                    if obj.effect ~= nil then
-                        activated = true
-                    end
+        if obj.shape == "rec" then
+            if mouse.x >= obj.x and
+            mouse.x <= obj.x+obj.w and
+            mouse.y >= obj.y and
+            mouse.y <= obj.y+obj.h then
+                if obj.effect ~= nil then
+                    activated = true
+                else
+                    activated = false
                 end
             end
         end
-        if love.mouse.isDown(obj.mouseTrigger) then
-        if activated == true then
-            if obj.effect.args ~= nil then
-                obj.effect.func(unpack(obj.effect.args))
-            elseif obj.effect.func ~= nil then
-                obj.effect.func()
-            end
-
-            if assignedTrigger == "falserActivate" then
-                obj.falser = true
+        if obj.shape == "circ" then
+            if distanceBetween(obj.x, mouse.x, obj.y, mouse.y) < obj.r then
+                if obj.effect ~= nil then
+                    activated = true
+                else
+                    activated = false
+                end
             end
         end
+        -- activated means the cursor is on top of the button, falser means it is yet to be pressed
+        for _, effect in ipairs(obj.effect) do
+            if activated == true then
 
-        else
-            obj.falser = false 
+            if effect.type == "onClick" then
+                if love.mouse.isDown(obj.mouseTrigger) and effect.falser == false then
+                    triggerEffect(effect)
+                    effect.falser = true
+                elseif not love.mouse.isDown(obj.mouseTrigger) then
+                    effect.falser = false
+                end
+            elseif effect.type == "onHover" and effect.falser == false then
+                triggerEffect(effect)
+                effect.falser = true
+            elseif effect.type == "onMouseLeave" then
+                effect.falser = false
+            end
+
+            else
+                if effect.type == "onMouseLeave" and effect.falser == false then
+                    triggerEffect(effect)
+                    effect.falser = true
+                elseif effect.type ~= "onMouseLeave" then
+                    effect.falser = false
+                end
+            end
         end
     end
 
@@ -72,12 +81,11 @@ function button.add_button(parameter)
         id = #reservedID
         table.insert(reservedID, id)
     end
-
+    for _, effect in ipairs(parameter.effect) do
+        effect.falser = effect.falser or false
+    end
     local mouseTrigger = parameter.mouseTrigger or 1
-    local trigger = parameter.triggerType or "press1"
-    buttonTable.trigger = trigger
     buttonTable.id = id
-    buttonTable.falser = false
     buttonTable.mouseTrigger = mouseTrigger
     table.insert(buttonMap, buttonTable)
 end
