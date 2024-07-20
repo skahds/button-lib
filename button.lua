@@ -110,6 +110,28 @@ function button.change_button(id, parameter)
     end
 end
 
+function button.change_button_effect(id, order, parameter)
+    for _, obj in ipairs(buttonMap) do
+        if obj.id == id then
+            if type(obj.effect[order]) == "table" then
+                -- changes values of obj to parameter
+                for key, value in pairs(parameter) do
+                    -- Check if the value is a table (I DON'T ABOUT THIS PART NESTED TABLE PART)
+                    if type(value) == "table" and type(obj.effect[order][key]) == "table" then
+                        -- Merge nested tables
+                        for nested_key, nested_value in pairs(value) do
+                            obj.effect[order][key][nested_key] = nested_value
+                        end
+                    else
+                        -- Directly assign non-table values
+                        obj.effect[order][key] = value
+                    end
+                end
+            end
+        end
+    end
+end
+
 function button.remove_button(id)
     for i, obj in ipairs(buttonMap) do
         if obj.id == id then
