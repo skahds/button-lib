@@ -85,7 +85,7 @@ this will add the button lib, make a rectangle shaped button in x position 50, y
             {
             type="onHover",
             func=Add_num,
-            args={5}
+            args={5, 10, 15}
             }}
             })
     end
@@ -98,6 +98,6 @@ this will add the button lib, make a rectangle shaped button in x position 50, y
     -- changes button of id 1 to have the x and y of 100 and 200
     button.change_button(1, {x=100, y=200})
 
-    -- changes the second effect of button with id 1 to have the type to "onMouseLeave"
-    button.change_button_effect(1, 2, {type="onMouseLeave"})
+    -- changes the second effect of button with id 1 to have the type to "onMouseLeave" and change the second arg into 30 while leaving the first one
+    button.change_button_effect(1, 2, {type="onMouseLeave", args={nil, 30}})
 ```
